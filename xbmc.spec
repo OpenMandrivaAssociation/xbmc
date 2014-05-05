@@ -3,7 +3,7 @@
 Summary:	XBMC Media Center - media player and home entertainment system
 Name:		xbmc
 Version:	12.2
-Release:	2
+Release:	2.1
 Group:		Video
 # nosefart audio plugin and RSXS-0.9 based screensavers are GPLv2 only
 # several eventclients are GPLv3+ (in subpackages)
