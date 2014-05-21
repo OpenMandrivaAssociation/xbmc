@@ -16,7 +16,7 @@ License:	GPLv2+ and GPLv2 and (LGPLv3+ with exceptions)
 Group:		Video
 Url:		http://xbmc.org/
 Source0:	http://mirrors.xbmc.org/releases/source/%{name}-%{version}-%{codename}.tar.gz
-Source1:	xbmc.rpmlint
+Source1:	xbmc.rpmlintrc
 Patch0:		xbmc-13.0-external-ffmpeg.patch
 Patch1:		xbmc-13.0-no-win32.patch
 # Display Music Videos in "Artist - Name" format instead of just "Name"
