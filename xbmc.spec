@@ -1,10 +1,10 @@
-%define build_cec	1
+%define build_cec 1
+%define codename Gotham
 
 Summary:	XBMC Media Center - media player and home entertainment system
 Name:		xbmc
-Version:	12.2
-Release:	2.1
-Group:		Video
+Version:	13.0
+Release:	1
 # nosefart audio plugin and RSXS-0.9 based screensavers are GPLv2 only
 # several eventclients are GPLv3+ (in subpackages)
 # libhdhomerun is LGPLv3+ with an exception (always ok to link against it)
@@ -13,16 +13,17 @@ Group:		Video
 # xbmc and therefore e.g. /usr/bin/xbmc is GPLv2+ with LGPLv3+ part
 # as allowed by a license exception
 License:	GPLv2+ and GPLv2 and (LGPLv3+ with exceptions)
-URL:		http://xbmc.org/
-Source0:	http://mirrors.xbmc.org/releases/source/%{name}-%{version}.tar.gz
-# Hack to workaround upgrading from our old hack... see patch header for more
-# details and an upstreaming plan.
-Patch0:		0001-hack-workaround-for-old-incompatible-PVR-addon-datab.patch
-Patch1:		xbmc-12.1-samba4.patch
+Group:		Video
+Url:		http://xbmc.org/
+Source0:	http://mirrors.xbmc.org/releases/source/%{name}-%{version}-%{codename}.tar.gz
+Source1:	xbmc.rpmlint
+Patch0:		xbmc-13.0-external-ffmpeg.patch
+Patch1:		xbmc-13.0-no-win32.patch
 # Display Music Videos in "Artist - Name" format instead of just "Name"
-Patch2:		xbmc-12.1-upnp-musicvideos-artist.patch
+Patch2:		xbmc-13.0-upnp-musicvideos-artist.patch
 # Fix bug with UPnP playback for Playlists
-Patch3:		xbmc-12.2-upnp-playlists.patch
+Patch3:		xbmc-13.0-upnp-playlists.patch
+
 BuildRequires:	afpclient-devel
 BuildRequires:	avahi-common-devel
 BuildRequires:	boost-devel
@@ -75,6 +76,7 @@ BuildRequires:	pkgconfig(libpng)
 BuildRequires:	pkgconfig(libpulse)
 BuildRequires:	pkgconfig(libshairport)
 BuildRequires:	pkgconfig(libva)
+BuildRequires:	pkgconfig(libxslt)
 BuildRequires:	pkgconfig(mad)
 BuildRequires:	pkgconfig(ogg)
 BuildRequires:	pkgconfig(openssl)
@@ -157,10 +159,75 @@ ideal solution for your home theater.
 
 Support for RAR files is not included due to license issues.
 
+%files
+%doc %{_docdir}/xbmc
+%{_sysconfdir}/X11/wmsession.d/15XBMC
+%{_bindir}/xbmc
+%{_bindir}/xbmc-standalone
+%dir %{_libdir}/xbmc
+%dir %{_libdir}/xbmc/addons
+%dir %{_libdir}/xbmc/system
+%dir %{_libdir}/xbmc/system/players
+%dir %{_libdir}/xbmc/system/players/dvdplayer
+%dir %{_libdir}/xbmc/system/players/paplayer
+%{_libdir}/xbmc/xbmc.bin
+%{_libdir}/xbmc/xbmc-xrandr
+%dir %{_libdir}/xbmc/addons/*
+%{_libdir}/xbmc/addons/*/*.so
+%{_libdir}/xbmc/addons/*/*.vis
+%{_libdir}/xbmc/addons/*/*.xbs
+%{_libdir}/xbmc/system/ImageLib-*.so
+%{_libdir}/xbmc/system/hdhomerun-*.so
+%{_libdir}/xbmc/system/libcmyth-*.so
+%{_libdir}/xbmc/system/libcpluff-*.so
+%{_libdir}/xbmc/system/libexif-*.so
+%{_libdir}/xbmc/system/players/dvdplayer/libdvdnav-*.so
+%{_libdir}/xbmc/system/players/paplayer/libsidplay2-*.so
+%{_libdir}/xbmc/system/players/paplayer/nosefart-*.so
+%{_libdir}/xbmc/system/players/paplayer/stsoundlibrary-*.so
+%{_libdir}/xbmc/system/players/paplayer/timidity-*.so
+%{_libdir}/xbmc/system/players/paplayer/vgmstream-*.so
+%ifarch %{ix86}
+%{_libdir}/xbmc/system/players/paplayer/SNESAPU-*.so
+%endif
+%dir %{_datadir}/xbmc
+%{_datadir}/xbmc/addons
+%{_datadir}/xbmc/FEH.py
+%{_datadir}/xbmc/language
+%{_datadir}/xbmc/media
+%{_datadir}/xbmc/sounds
+%{_datadir}/xbmc/system
+%{_datadir}/xbmc/userdata
+%{_datadir}/applications/xbmc.desktop
+%{_iconsdir}/hicolor/*/apps/xbmc.png
+
+#----------------------------------------------------------------------------
+
+%package	devel
+Summary:	Development files for XBMC
+License:	GPLv2+
+Group:		Development/C
+Provides:	xbmc-eventclients-devel = %{EVRD}
+Conflicts:	xbmc-eventclients-devel < 13.0
+Obsoletes:	xbmc-eventclients-devel < 13.0
+
+%description	devel
+XBMC is an award-winning free and open source software media player
+and entertainment hub for digital media.
+
+This package contains files needed to build addons and eventclients.
+
+%files devel
+%dir %{_includedir}/xbmc
+%{_includedir}/xbmc/*
+%{_libdir}/xbmc/*.cmake
+
+#----------------------------------------------------------------------------
+
 %package	eventclients-common
 Summary:	Common files for XBMC eventclients
-Group:		Video
 License:	GPLv2+
+Group:		Video
 
 %description	eventclients-common
 XBMC is an award-winning free and open source software media player
@@ -168,22 +235,18 @@ and entertainment hub for digital media.
 
 This package contains common files for eventclients.
 
-%package	eventclients-devel
-Summary:	Development files for XBMC eventclients
-Group:		Development/C
-License:	GPLv2+
+%files eventclients-common
+%{python_sitelib}/xbmc
+%dir %{_datadir}/pixmaps/xbmc
+%{_datadir}/pixmaps/xbmc/*.png
 
-%description	eventclients-devel
-XBMC is an award-winning free and open source software media player
-and entertainment hub for digital media.
-
-This package contains files needed to build eventclients.
+#----------------------------------------------------------------------------
 
 %package	eventclient-wiiremote
 Summary:	Wii Remote eventclient for XBMC
-Group:		Video
 License:	GPLv3+
-Requires:	%{name}-eventclients-common = %{version}-%{release}
+Group:		Video
+Requires:	%{name}-eventclients-common = %{EVRD}
 
 %description	eventclient-wiiremote
 XBMC is an award-winning free and open source software media player
@@ -191,12 +254,17 @@ and entertainment hub for digital media.
 
 This package contains the Wii Remote eventclient.
 
+%files eventclient-wiiremote
+%{_bindir}/xbmc-wiiremote
+
+#----------------------------------------------------------------------------
+
 %package	eventclient-j2me
 Summary:	J2ME eventclient for XBMC
-Group:		Video
 License:	GPLv2+
+Group:		Video
 Requires:	python-pybluez
-Requires:	%{name}-eventclients-common = %{version}-%{release}
+Requires:	%{name}-eventclients-common = %{EVRD}
 
 %description	eventclient-j2me
 XBMC is an award-winning free and open source software media player
@@ -205,12 +273,17 @@ and entertainment hub for digital media.
 This package contains the J2ME eventclient, providing a bluetooth
 server that can communicate with a mobile tool supporting J2ME.
 
+%files eventclient-j2me
+%{_bindir}/xbmc-j2meremote
+
+#----------------------------------------------------------------------------
+
 %package	eventclient-ps3
 Summary:	PS3 eventclients for XBMC
-Group:		Video
 License:	GPLv2+
+Group:		Video
 Requires:	python-pybluez
-Requires:	%{name}-eventclients-common = %{version}-%{release}
+Requires:	%{name}-eventclients-common = %{EVRD}
 # requires via zeroconf.py, only used by xbmc-ps3d:
 Requires:	python-gobject avahi-python python-dbus
 
@@ -220,11 +293,17 @@ and entertainment hub for digital media.
 
 This package contains the PS3 remote and sixaxis eventclients.
 
+%files eventclient-ps3
+%{_bindir}/xbmc-ps3d
+%{_bindir}/xbmc-ps3remote
+
+#----------------------------------------------------------------------------
+
 %package	eventclient-xbmc-send
 Summary:	PS3 eventclient for XBMC
-Group:		Video
 License:	GPLv2+
-Requires:	%{name}-eventclients-common = %{version}-%{release}
+Group:		Video
+Requires:	%{name}-eventclients-common = %{EVRD}
 
 %description	eventclient-xbmc-send
 XBMC is an award-winning free and open source software media player
@@ -232,15 +311,20 @@ and entertainment hub for digital media.
 
 This package contains the xbmc-send eventclient.
 
+%files eventclient-xbmc-send
+%{_bindir}/xbmc-send
+
+#----------------------------------------------------------------------------
+
 %prep
-%setup -q
+%setup -qn %{name}-%{version}-%{codename}
 %patch0 -p1
-# Support for Samba 4
-%if %{mdvver} >= 201300
 %patch1 -p1
-%endif
 %patch2 -p1
 %patch3 -p1
+
+find . -name "Makefile*" -o -name "*.m4" -o -name "configure*" -o -name "missing" -o -name "bootstrap*" |xargs sed -i -e 's,configure.in,configure.ac,g'
+cp configure.in configure.ac
 
 # otherwise backups end up in binary rpms
 find -type f \( -name '*.00??' -o -name '*.00??~' \) -print -delete
@@ -250,8 +334,6 @@ find -type f \( -iname '*.so' -o -iname '*.dll' -o -iname '*.exe' \) -delete
 
 # GPLv2 only
 rm -r lib/cmyth/Win32/include/mysql
-# BSD 4-clause
-rm -r xbmc/cores/DllLoader/exports/emu_socket
 
 # win32 only
 rm -rf system/players/dvdplayer/etc/fonts
@@ -344,69 +426,4 @@ ok=1
 [ -n "$fhserr" ] && echo -e "$fhserr" && echo "Binaries in datadir!" && ok=
 [ -n "$ok" ]
 )
-
-%files
-%doc %{_docdir}/xbmc
-%{_sysconfdir}/X11/wmsession.d/15XBMC
-%{_bindir}/xbmc
-%{_bindir}/xbmc-standalone
-%dir %{_libdir}/xbmc
-%dir %{_libdir}/xbmc/addons
-%dir %{_libdir}/xbmc/system
-%dir %{_libdir}/xbmc/system/players
-%dir %{_libdir}/xbmc/system/players/dvdplayer
-%dir %{_libdir}/xbmc/system/players/paplayer
-%{_libdir}/xbmc/xbmc.bin
-%{_libdir}/xbmc/xbmc-xrandr
-%dir %{_libdir}/xbmc/addons/*
-%{_libdir}/xbmc/addons/*/*.so
-%{_libdir}/xbmc/addons/*/*.vis
-%{_libdir}/xbmc/addons/*/*.xbs
-%{_libdir}/xbmc/system/ImageLib-*.so
-%{_libdir}/xbmc/system/hdhomerun-*.so
-%{_libdir}/xbmc/system/libcmyth-*.so
-%{_libdir}/xbmc/system/libcpluff-*.so
-%{_libdir}/xbmc/system/libexif-*.so
-%{_libdir}/xbmc/system/players/dvdplayer/libdvdnav-*.so
-%{_libdir}/xbmc/system/players/paplayer/adpcm-*.so
-%{_libdir}/xbmc/system/players/paplayer/libsidplay2-*.so
-%{_libdir}/xbmc/system/players/paplayer/nosefart-*.so
-%{_libdir}/xbmc/system/players/paplayer/stsoundlibrary-*.so
-%{_libdir}/xbmc/system/players/paplayer/timidity-*.so
-%{_libdir}/xbmc/system/players/paplayer/vgmstream-*.so
-%ifarch %{ix86}
-%{_libdir}/xbmc/system/players/paplayer/SNESAPU-*.so
-%endif
-%dir %{_datadir}/xbmc
-%{_datadir}/xbmc/addons
-%{_datadir}/xbmc/FEH.py
-%{_datadir}/xbmc/language
-%{_datadir}/xbmc/media
-%{_datadir}/xbmc/sounds
-%{_datadir}/xbmc/system
-%{_datadir}/xbmc/userdata
-%{_datadir}/applications/xbmc.desktop
-%{_iconsdir}/hicolor/*/apps/xbmc.png
-
-%files eventclients-common
-%{python_sitelib}/xbmc
-%dir %{_datadir}/pixmaps/xbmc
-%{_datadir}/pixmaps/xbmc/*.png
-
-%files eventclients-devel
-%dir %{_includedir}/xbmc
-%{_includedir}/xbmc/xbmcclient.h
-
-%files eventclient-j2me
-%{_bindir}/xbmc-j2meremote
-
-%files eventclient-ps3
-%{_bindir}/xbmc-ps3d
-%{_bindir}/xbmc-ps3remote
-
-%files eventclient-xbmc-send
-%{_bindir}/xbmc-send
-
-%files eventclient-wiiremote
-%{_bindir}/xbmc-wiiremote
 
