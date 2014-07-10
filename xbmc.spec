@@ -208,8 +208,8 @@ Summary:	Development files for XBMC
 License:	GPLv2+
 Group:		Development/C
 Provides:	xbmc-eventclients-devel = %{EVRD}
-Conflicts:	xbmc-eventclients-devel < 13.0
-Obsoletes:	xbmc-eventclients-devel < 13.0
+Conflicts:	xbmc-eventclients-devel < 13.1
+Obsoletes:	xbmc-eventclients-devel < 13.1
 
 %description	devel
 XBMC is an award-winning free and open source software media player
