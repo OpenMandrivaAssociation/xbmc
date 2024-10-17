@@ -14,7 +14,7 @@ Release:	3
 # as allowed by a license exception
 License:	GPLv2+ and GPLv2 and (LGPLv3+ with exceptions)
 Group:		Video
-Url:		http://xbmc.org/
+Url:		https://xbmc.org/
 #Source0:	http://mirrors.xbmc.org/releases/source/%{name}-%{version}.tar.gz
 Source0: 	xbmc-13.1.tar.gz
 Source1:	xbmc.rpmlintrc
